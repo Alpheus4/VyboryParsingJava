@@ -29,5 +29,6 @@
     <FileEntry Name="vuser_end.c" Filter="1" />
     <FileEntry Name="vuser_init.c" Filter="1" />
     <FileEntry Name="vybory.txt" Filter="1" />
+    <FileEntry Name=".git\" Filter="1" />
   </GeneralFiles>
 </VugenScriptMetadata>

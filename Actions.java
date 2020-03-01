@@ -73,67 +73,76 @@ public class Actions
         	}
 		}
         
-        FileWriter writer = new FileWriter("vybory.txt");
-        writer.write("Регион, Нижестоящая ИК, УИК, Бабурин, Грудинин, Жириновский, Путин, Собчак, Сурайкин, Титов, Явлинский" + "\n");
-        //Получение УИКов
-        
-        for (String uikLink : nicArrayList)
+        try(FileWriter writer = new FileWriter("vybory.txt"))
         {
-        	url = uikLink;
-  			doc = Jsoup.connect(url).get();
-  			
-  			Elements uikLinks = doc.select("option[value~=(.*?)]"); //получение всех ссылок УИКов
-  			
-  			for (Element link : uikLinks)
-  				
-  			{
-  				String uikLink1 = String.valueOf(link).replace("amp;","");
-  				
-  				Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-	            Matcher matcher = pattern.matcher(String.valueOf(uikLink1));
-				if (matcher.find()) 
-				{
-					url = matcher.group(1);
-					doc = Jsoup.connect(url).get();
+        	writer.write("Регион,Нижестоящая ИК,УИК,Бабурин,Грудинин,Жириновский,Путин,Собчак,Сурайкин,Титов,Явлинский" + "\r\n");
+	        //Получение УИКов
+	        
+	        for (String uikLink : nicArrayList)
+	        {
+	        	url = uikLink;
+	  			doc = Jsoup.connect(url).get();
+	  			
+	  			Elements uikLinks = doc.select("option[value~=(.*?)]"); //получение всех ссылок УИКов
+	  			
+	  			for (Element link : uikLinks)
+	  				
+	  			{
+	  				String uikLink1 = String.valueOf(link).replace("amp;","");
+	  				
+	  				Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+		            Matcher matcher = pattern.matcher(String.valueOf(uikLink1));
+					if (matcher.find()) 
+					{
+						url = matcher.group(1);
+						doc = Jsoup.connect(url).get();
+						
+						Element lastLink = doc.select("a").last();
+						String lastLink1 = String.valueOf(lastLink).replace("amp;","");
+						
+						//ССЫЛКА НА ТАБЛИЦУ
+						Pattern pattern1 = Pattern.compile("\"([^\"]*)\"");
+		           	 	Matcher matcher1 = pattern1.matcher(String.valueOf(lastLink1));
+		           	 	
+		           	 	if (matcher1.find())
+		           	 	{
+		           	 		url = matcher1.group(1);
+		           	 		doc = Jsoup.connect(url).get();
+		           	 		
+		           	 		Elements regNicUik = doc.select("[href~=(.*region=43)]");
+		           	 		String regNicUikText = "";
+					        for (Element elements : regNicUik)
+					        {
+					        	regNicUikText += elements.text() + ",";
+					        }
+					       
 					
-					Element lastLink = doc.select("a").last();
-					String lastLink1 = String.valueOf(lastLink).replace("amp;","");
-					
-					//ССЫЛКА НА ТАБЛИЦУ
-					Pattern pattern1 = Pattern.compile("\"([^\"]*)\"");
-	           	 	Matcher matcher1 = pattern1.matcher(String.valueOf(lastLink1));
-	           	 	
-	           	 	if (matcher1.find())
-	           	 	{
-	           	 		url = matcher1.group(1);
-	           	 		doc = Jsoup.connect(url).get();
-	           	 		
-	           	 		Elements regNicUik = doc.select("[href~=(.*region=43)]");
-				        String regNicUikText = regNicUik.text();
-				
-				        Elements table = doc.select("html");
-				        String text = table.outerHtml();
-				        
-				        Pattern pattern2 = Pattern.compile("(?:ч|а)<.td>\\s+<td style=\"color:black\" align=\"right\"><b>(.*?)<.b>");
-				        Matcher matcher2 = pattern2.matcher(text);
-				        
-				        String ttt = "";
-				       
-				        while (matcher2.find())
-				        {
-				        	ttt += " " + matcher2.group(1) + " ";
-				        	
-				        }
-				        
-				        System.out.println("In while " + regNicUikText + " " + ttt + "\n");
-				        writer.write(regNicUikText + " " + ttt + "\n");			       
-	           	 	}
-				}
-  			}
+					        Elements table = doc.select("html");
+					        String text = table.outerHtml();
+					        
+					        Pattern pattern2 = Pattern.compile("(?:ч|а)<.td>\\s+<td style=\"color:black\" align=\"right\"><b>(.*?)<.b>");
+					        Matcher matcher2 = pattern2.matcher(text);
+					        
+					        String tableText = "";
+					       
+					        while (matcher2.find())
+					        {
+					        	tableText += matcher2.group(1) + ",";
+					        }
+					        
+					        System.out.println(regNicUikText + tableText.substring(0, tableText.length() - 1) + "\n");
+					        writer.write(regNicUikText + tableText.substring(0, tableText.length() - 1) + "\r\n");
+		           	 	}
+					}
+	  			}
+	        }
+	        writer.close(); 
         }
-        writer.close(); 
-    
+    	catch (FileNotFoundException e) { throw e; }
+        catch (IOException e) { System.err.print("Something went wrong"); }	
+        
 		return 0;
+		
 	}//end of action
 
 

@@ -51,7 +51,7 @@ vuser_end=Java-Interpreter
 [TransactionsOrder]
 Order=
 [StateManagement]
-LastReplayStatus=3
+LastReplayStatus=1
 [ActiveReplay]
 LastReplayedRunName=
 ActiveRunName=
